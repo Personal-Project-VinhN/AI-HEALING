@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+
+# Repair artifacts (regenerated at runtime)
+repair-reports/
+automation-test/repair-reports/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

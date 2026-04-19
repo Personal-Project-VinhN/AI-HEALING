@@ -1,0 +1,82 @@
+{
+  "#username": {
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "healedAt": "2026-04-19T14:59:36.949Z"
+  },
+  "#password": {
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "healedAt": "2026-04-19T14:59:38.965Z"
+  },
+  "#login-btn": {
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "healedAt": "2026-04-19T14:59:41.021Z"
+  },
+  "#dashboard-title": {
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"Home\"]",
+    "healedAt": "2026-04-19T14:59:20.621Z"
+  },
+  "#total-users": {
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "healedAt": "2026-04-19T14:57:40.853Z"
+  },
+  "#active-sessions": {
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-sessions\"]",
+    "healedAt": "2026-04-19T14:57:42.872Z"
+  },
+  "#reports": {
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-reports\"]",
+    "healedAt": "2026-04-19T14:57:44.890Z"
+  },
+  "#user-table": {
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "healedAt": "2026-04-19T14:59:22.636Z"
+  },
+  "#nav-profile": {
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "healedAt": "2026-04-19T14:59:24.647Z"
+  },
+  "#first-name": {
+    "strategy": "CACHED",
+    "healedLocator": "#fname",
+    "healedAt": "2026-04-19T14:59:26.675Z"
+  },
+  "#save-btn": {
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "healedAt": "2026-04-19T14:59:34.739Z"
+  },
+  "#cancel-btn": {
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "healedAt": "2026-04-19T14:58:48.780Z"
+  },
+  "#last-name": {
+    "strategy": "CACHED",
+    "healedLocator": "#lname",
+    "healedAt": "2026-04-19T14:59:28.691Z"
+  },
+  "#user-email": {
+    "strategy": "CACHED",
+    "healedLocator": "#contact-email",
+    "healedAt": "2026-04-19T14:59:30.709Z"
+  },
+  "#user-role": {
+    "strategy": "CACHED",
+    "healedLocator": "#position",
+    "healedAt": "2026-04-19T14:59:32.725Z"
+  },
+  "#logout-btn": {
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign out\"]",
+    "healedAt": "2026-04-19T14:59:43.061Z"
+  }
+}

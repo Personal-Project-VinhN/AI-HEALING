@@ -1,0 +1,28 @@
+{
+  "name": "self-healing-automation-test",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test:traditional:v1": "cross-env UI_VERSION=1 npx playwright test tests/traditional/",
+    "test:traditional:v2": "cross-env UI_VERSION=2 npx playwright test tests/traditional/",
+    "test:healing:v2": "cross-env UI_VERSION=2 npx playwright test tests/self-healing/",
+    "test:ai:v2": "cross-env UI_VERSION=2 npx playwright test tests/ai-healing/",
+    "test:llm:v2": "cross-env UI_VERSION=2 npx playwright test tests/llm-healing/",
+    "test:repair:v2": "cross-env UI_VERSION=2 npx playwright test tests/self-repair/",
+    "test:llm-generated": "cross-env UI_VERSION=2 npx playwright test tests/llm-generated/",
+    "test:demo": "node run-demo.js",
+    "test:demo:full": "node run-demo.js --include-repair",
+    "generate:profiles": "node generators/profileGenerator.js",
+    "generate:tests": "node generators/testGenerator.js",
+    "sync:healed": "node generators/syncHealed.js",
+    "sync:healed:dry": "node generators/syncHealed.js --dry-run",
+    "report": "npx playwright show-report",
+    "report:repair": "ls -la repair-reports/"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^17.3.1",
+    "openai": "^6.27.0"
+  }
+}

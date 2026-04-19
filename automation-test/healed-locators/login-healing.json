@@ -1,0 +1,1250 @@
+[
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:00.368Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:02.407Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:04.663Z"
+  },
+  {
+    "originalLocator": "#dashboard-title",
+    "strategy": "TEXT_LINK",
+    "healedLocator": "role=link[name=\"Home\"]",
+    "success": true,
+    "description": "dashboard/home title",
+    "timestamp": "2026-03-10T08:58:06.882Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:09.153Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:11.192Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:13.223Z"
+  },
+  {
+    "originalLocator": "#total-users",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "total users stat card",
+    "timestamp": "2026-03-10T08:58:15.459Z"
+  },
+  {
+    "originalLocator": "#active-sessions",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-sessions\"]",
+    "success": true,
+    "description": "active sessions stat card",
+    "timestamp": "2026-03-10T08:58:17.693Z"
+  },
+  {
+    "originalLocator": "#reports",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-reports\"]",
+    "success": true,
+    "description": "reports/analytics stat card",
+    "timestamp": "2026-03-10T08:58:19.903Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:22.332Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:24.377Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:26.406Z"
+  },
+  {
+    "originalLocator": "#user-table",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "user/members data table",
+    "timestamp": "2026-03-10T08:58:29.013Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:31.336Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:33.378Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:35.405Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "TEXT_LINK",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T08:58:37.787Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:40.174Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:42.211Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:44.255Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T08:58:46.324Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T08:58:48.424Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-03-10T08:58:50.626Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-03-10T08:58:52.850Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:58:55.183Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:58:57.225Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:58:59.255Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T08:59:01.322Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T08:59:03.433Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=family",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-03-10T08:59:05.499Z"
+  },
+  {
+    "originalLocator": "#user-email",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "email input",
+    "timestamp": "2026-03-10T08:59:07.526Z"
+  },
+  {
+    "originalLocator": "#user-role",
+    "strategy": "LABEL",
+    "healedLocator": "label~=position",
+    "success": true,
+    "description": "role/position select",
+    "timestamp": "2026-03-10T08:59:09.567Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-03-10T08:59:11.590Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:59:13.895Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:59:15.933Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:59:17.971Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T08:59:20.027Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T08:59:22.125Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=family",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-03-10T08:59:24.186Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-03-10T08:59:26.216Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T08:59:28.298Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:59:30.612Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:59:32.642Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:59:34.658Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:59:37.092Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:59:39.547Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:59:41.587Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:59:43.621Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T08:59:46.029Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T08:59:48.068Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T08:59:50.096Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:04:25.187Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:04:27.232Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:04:29.511Z"
+  },
+  {
+    "originalLocator": "#dashboard-title",
+    "strategy": "TEXT_LINK",
+    "healedLocator": "role=link[name=\"Home\"]",
+    "success": true,
+    "description": "dashboard/home title",
+    "timestamp": "2026-03-10T10:04:31.754Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:04:34.060Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:04:36.106Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:04:38.137Z"
+  },
+  {
+    "originalLocator": "#total-users",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "total users stat card",
+    "timestamp": "2026-03-10T10:04:40.400Z"
+  },
+  {
+    "originalLocator": "#active-sessions",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-sessions\"]",
+    "success": true,
+    "description": "active sessions stat card",
+    "timestamp": "2026-03-10T10:04:42.570Z"
+  },
+  {
+    "originalLocator": "#reports",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-reports\"]",
+    "success": true,
+    "description": "reports/analytics stat card",
+    "timestamp": "2026-03-10T10:04:44.695Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:04:46.987Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:04:49.047Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:04:51.070Z"
+  },
+  {
+    "originalLocator": "#user-table",
+    "strategy": "DATA_TESTID",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "user/members data table",
+    "timestamp": "2026-03-10T10:04:53.639Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:04:55.929Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:04:57.993Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:05:00.045Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "TEXT_LINK",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T10:05:02.342Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:05:04.695Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:05:06.744Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:05:08.789Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T10:05:10.867Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T10:05:12.982Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-03-10T10:05:15.189Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "TEXT_BUTTON",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-03-10T10:05:17.365Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:05:19.635Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:05:21.675Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:05:23.704Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T10:05:25.779Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T10:05:27.883Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=family",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-03-10T10:05:29.953Z"
+  },
+  {
+    "originalLocator": "#user-email",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "email input",
+    "timestamp": "2026-03-10T10:05:31.981Z"
+  },
+  {
+    "originalLocator": "#user-role",
+    "strategy": "LABEL",
+    "healedLocator": "label~=position",
+    "success": true,
+    "description": "role/position select",
+    "timestamp": "2026-03-10T10:05:34.036Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-03-10T10:05:36.070Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:05:38.421Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:05:40.457Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:05:42.490Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-03-10T10:05:44.574Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T10:05:46.674Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=family",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-03-10T10:05:48.746Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-03-10T10:05:50.780Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "LABEL",
+    "healedLocator": "label~=given",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-03-10T10:05:52.874Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:05:55.228Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:05:57.250Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:05:59.289Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:06:01.717Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:06:04.263Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:06:06.303Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:06:08.336Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "LABEL",
+    "healedLocator": "label~=email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-03-10T10:06:10.831Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "LABEL",
+    "healedLocator": "label~=password",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-03-10T10:06:12.873Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-03-10T10:06:14.918Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:57:26.363Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:57:28.407Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:57:30.471Z"
+  },
+  {
+    "originalLocator": "#dashboard-title",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"Home\"]",
+    "success": true,
+    "description": "dashboard/home title",
+    "timestamp": "2026-04-19T14:57:32.518Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:57:34.710Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:57:36.731Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:57:38.792Z"
+  },
+  {
+    "originalLocator": "#total-users",
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "total users stat card",
+    "timestamp": "2026-04-19T14:57:40.853Z"
+  },
+  {
+    "originalLocator": "#active-sessions",
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-sessions\"]",
+    "success": true,
+    "description": "active sessions stat card",
+    "timestamp": "2026-04-19T14:57:42.872Z"
+  },
+  {
+    "originalLocator": "#reports",
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-reports\"]",
+    "success": true,
+    "description": "reports/analytics stat card",
+    "timestamp": "2026-04-19T14:57:44.890Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:57:47.077Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:57:49.103Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:57:51.160Z"
+  },
+  {
+    "originalLocator": "#user-table",
+    "strategy": "CACHED",
+    "healedLocator": "[data-testid=\"stat-users\"]",
+    "success": true,
+    "description": "user/members data table",
+    "timestamp": "2026-04-19T14:57:53.206Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:57:55.402Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:57:57.423Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:57:59.485Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-04-19T14:58:01.532Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:58:03.749Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:58:05.773Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:58:07.838Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-04-19T14:58:09.886Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "CACHED",
+    "healedLocator": "#fname",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-04-19T14:58:11.937Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-04-19T14:58:13.952Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-04-19T14:58:15.966Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:58:18.144Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:58:20.172Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:58:22.230Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-04-19T14:58:24.274Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "CACHED",
+    "healedLocator": "#fname",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-04-19T14:58:26.315Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "CACHED",
+    "healedLocator": "#lname",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-04-19T14:58:28.337Z"
+  },
+  {
+    "originalLocator": "#user-email",
+    "strategy": "CACHED",
+    "healedLocator": "#contact-email",
+    "success": true,
+    "description": "email input",
+    "timestamp": "2026-04-19T14:58:30.356Z"
+  },
+  {
+    "originalLocator": "#user-role",
+    "strategy": "CACHED",
+    "healedLocator": "#position",
+    "success": true,
+    "description": "role/position select",
+    "timestamp": "2026-04-19T14:58:32.374Z"
+  },
+  {
+    "originalLocator": "#save-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Submit\"]",
+    "success": true,
+    "description": "save/submit button",
+    "timestamp": "2026-04-19T14:58:34.391Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:58:36.589Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:58:38.611Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:58:40.666Z"
+  },
+  {
+    "originalLocator": "#nav-profile",
+    "strategy": "CACHED",
+    "healedLocator": "role=link[name=\"My Account\"]",
+    "success": true,
+    "description": "nav profile/account link",
+    "timestamp": "2026-04-19T14:58:42.712Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "CACHED",
+    "healedLocator": "#fname",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-04-19T14:58:44.746Z"
+  },
+  {
+    "originalLocator": "#last-name",
+    "strategy": "CACHED",
+    "healedLocator": "#lname",
+    "success": true,
+    "description": "last name input",
+    "timestamp": "2026-04-19T14:58:46.766Z"
+  },
+  {
+    "originalLocator": "#cancel-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Discard\"]",
+    "success": true,
+    "description": "cancel/discard button",
+    "timestamp": "2026-04-19T14:58:48.780Z"
+  },
+  {
+    "originalLocator": "#first-name",
+    "strategy": "CACHED",
+    "healedLocator": "#fname",
+    "success": true,
+    "description": "first name input",
+    "timestamp": "2026-04-19T14:58:50.804Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:58:53.055Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:58:55.075Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:58:57.091Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:58:59.387Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:59:01.759Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:59:03.776Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:59:05.828Z"
+  },
+  {
+    "originalLocator": "#username",
+    "strategy": "CACHED",
+    "healedLocator": "#email",
+    "success": true,
+    "description": "username/email input",
+    "timestamp": "2026-04-19T14:59:08.149Z"
+  },
+  {
+    "originalLocator": "#password",
+    "strategy": "CACHED",
+    "healedLocator": "#pass-field",
+    "success": true,
+    "description": "password input",
+    "timestamp": "2026-04-19T14:59:10.163Z"
+  },
+  {
+    "originalLocator": "#login-btn",
+    "strategy": "CACHED",
+    "healedLocator": "role=button[name=\"Sign in\"]",
+    "success": true,
+    "description": "login/signin button",
+    "timestamp": "2026-04-19T14:59:12.208Z"
+  }
+]
