@@ -12,19 +12,21 @@ const MAIN_APP_DIR = path.join(__dirname, '..', 'main-app');
  * Self-Healing orchestrator.
  *
  * Automated flow:
+ *   0. (Optional) Generate locators from profiles + DOM if missing
  *   1. Start app server
  *   2. Run tests (expect FAIL with broken locators)
  *   3. Collect DOM context for each broken locator
- *   4. Auto-fix: analyze DOM and patch locator/profile files
+ *   4. Cursor Agent CLI heals locator/profile files
  *   5. Re-run tests (expect PASS)
  *   6. Generate report with all changes
  *
  * Commands:
- *   node run-healing.js            - Full auto flow
- *   node run-healing.js collect    - Only collect DOM context
- *   node run-healing.js fix        - Only auto-fix from existing context
- *   node run-healing.js report     - Generate report
- *   node run-healing.js clean      - Clean context files
+ *   node run-healing.js              - Full auto flow (Cursor Agent)
+ *   node run-healing.js generate     - Generate locators from profiles + DOM
+ *   node run-healing.js collect      - Only collect DOM context
+ *   node run-healing.js fix-rule     - Rule-based auto-fix (no LLM)
+ *   node run-healing.js report       - Generate report
+ *   node run-healing.js clean        - Clean context files
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
@@ -205,15 +207,39 @@ async function collectContexts() {
 }
 
 /**
- * Auto-fix locators from context files.
+ * Heal locators using Cursor Agent CLI (LLM-powered).
  *
  * @returns {Promise<object>}
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
-async function autoFix() {
+async function cursorAgentHeal() {
+  const { cursorAgentHeal: heal } = await import('./utils/cursorAgentHealer.js');
+  return heal();
+}
+
+/**
+ * Rule-based auto-fix (fallback, no LLM).
+ *
+ * @returns {Promise<object>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function autoFixRule() {
   const { runAutoFix } = await import('./utils/autoFix.js');
   return runAutoFix();
+}
+
+/**
+ * Generate locators from profiles by scanning the live DOM.
+ *
+ * @returns {Promise<object>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function generateLocatorsFromProfiles() {
+  const { generateLocators } = await import('./utils/locatorGenerator.js');
+  return generateLocators({ port: PORT });
 }
 
 /**
@@ -257,12 +283,18 @@ async function cleanUp() {
  * @lastupdate Gin<gin_vn@haldata.net>
  */
 async function runHealing() {
-  banner('SELF-HEALING AUTOMATION');
-  console.log('  Flow: Run Tests → Fail → Collect → Fix → Verify → Report\n');
+  banner('AI SELF-HEALING AUTOMATION');
+  console.log('  Flow: Run Tests → Fail → Collect → Cursor Agent Heal → Verify → Report\n');
 
   const server = await startServer();
 
   try {
+    const { hasLocatorFiles } = await import('./utils/locatorGenerator.js');
+    if (!hasLocatorFiles()) {
+      phase(0, 'Generate locators from profiles + DOM');
+      await generateLocatorsFromProfiles();
+    }
+
     phase(1, 'Run tests');
     clearContext();
     const testResult = runTestsWithReporter();
@@ -271,7 +303,7 @@ async function runHealing() {
       console.log('\n  ✅ All tests passed. No healing needed.');
       return;
     }
-    console.log('\n  ❌ Tests failed — starting self-healing...');
+    console.log('\n  ❌ Tests failed — starting AI self-healing...');
 
     phase(2, 'Collect DOM context for broken locators');
     const collectResult = await collectContexts();
@@ -281,19 +313,22 @@ async function runHealing() {
       return;
     }
 
-    phase(3, 'Auto-fix locators');
-    const fixResult = await autoFix();
+    phase(3, 'Cursor Agent healing (LLM-powered)');
+    const fixResult = await cursorAgentHeal();
     let verifySuccess = false;
 
     if (fixResult.totalFixed === 0) {
-      console.log('\n  ⚠️  No locators could be auto-fixed. Manual review required.');
+      console.log('\n  ⚠️  Cursor Agent could not fix locators.');
+      if (fixResult.error === 'Agent CLI not available') {
+        console.log('  💡 Tip: Use "npm run heal:fix-rule" for rule-based fallback.');
+      }
     } else {
       phase(4, 'Verify fixes');
       const verifyResult = runTests();
       verifySuccess = verifyResult.success;
 
       if (verifySuccess) {
-        console.log('\n  ✅ All tests passed after healing!');
+        console.log('\n  ✅ All tests passed after AI healing!');
       } else {
         console.log('\n  ⚠️  Some tests still failing (may be non-locator issues).');
       }
@@ -304,9 +339,9 @@ async function runHealing() {
 
     console.log('');
     if (verifySuccess) {
-      banner('HEALING COMPLETE — ALL TESTS PASSING');
+      banner('AI HEALING COMPLETE — ALL TESTS PASSING');
     } else {
-      banner('HEALING INCOMPLETE — MANUAL REVIEW NEEDED');
+      banner('AI HEALING INCOMPLETE — REVIEW NEEDED');
     }
 
     console.log('\n  Modified files:');
@@ -325,14 +360,20 @@ async function runHealing() {
 const command = process.argv[2] || 'default';
 
 switch (command) {
+  case 'generate':
+    (async () => {
+      const s = await startServer();
+      try { await generateLocatorsFromProfiles(); } finally { stopServer(s); }
+    })();
+    break;
   case 'collect':
     (async () => {
       const s = await startServer();
       try { await collectContexts(); } finally { stopServer(s); }
     })();
     break;
-  case 'fix':
-    autoFix();
+  case 'fix-rule':
+    autoFixRule();
     break;
   case 'report':
     generateReport(process.argv[3] || 'unknown');

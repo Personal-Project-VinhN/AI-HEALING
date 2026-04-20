@@ -93,26 +93,34 @@ export async function generateJsonReport(options = {}) {
     });
   }
 
+  const healingMethod = fixResult?.healingMethod || 'rule-based';
+
   const report = {
     timestamp: new Date().toISOString(),
+    healingMethod,
     verifyResult,
     totalFailures: contextFiles.length,
     totalChanges: changes.filter((c) => c.changed).length,
     unchangedCount: changes.filter((c) => !c.changed).length,
     changes,
-    autoFixDetails: fixResult ? {
+    fixDetails: fixResult ? {
       totalProcessed: fixResult.totalProcessed,
       totalFixed: fixResult.totalFixed,
-      totalSkipped: fixResult.totalSkipped,
+      totalFailed: fixResult.totalFailed ?? fixResult.totalSkipped ?? 0,
+      healingMethod,
       fixes: (fixResult.fixes || []).map((f) => ({
         locatorKey: f.locatorKey,
         failedLocator: f.failedLocator,
-        newSelector: f.newSelector,
-        confidence: f.confidence,
-        score: f.score,
-        reasoning: f.reasoning,
+        newSelector: f.newSelector || null,
+        confidence: f.confidence || null,
+        score: f.score || null,
+        reasoning: f.reasoning || null,
         status: f.status,
-        patchedFiles: f.patchedFiles,
+        patchedFiles: f.patchedFiles || null,
+        agentSuccess: f.agentSuccess ?? null,
+        agentOutput: f.agentOutput ? f.agentOutput.substring(0, 500) : null,
+        durationMs: f.durationMs || null,
+        prompt: f.prompt ? f.prompt.substring(0, 300) : null,
       })),
     } : null,
   };
@@ -139,15 +147,17 @@ export function generateMarkdownReport(jsonReport) {
   }
 
   const lines = [];
-  lines.push('# Self-Healing Report');
+  lines.push('# AI Self-Healing Report');
   lines.push('');
   lines.push(`**Generated:** ${jsonReport.timestamp}`);
+  lines.push(`**Healing method:** ${jsonReport.healingMethod || 'unknown'}`);
   lines.push(`**Verify result:** ${jsonReport.verifyResult}`);
   lines.push('');
   lines.push('## Summary');
   lines.push('');
   lines.push(`| Metric | Value |`);
   lines.push(`|--------|-------|`);
+  lines.push(`| Healing method | ${jsonReport.healingMethod || 'unknown'} |`);
   lines.push(`| Total failures | ${jsonReport.totalFailures} |`);
   lines.push(`| Locators fixed | ${jsonReport.totalChanges} |`);
   lines.push(`| Unchanged | ${jsonReport.unchangedCount} |`);
@@ -166,15 +176,42 @@ export function generateMarkdownReport(jsonReport) {
     lines.push('');
   }
 
-  if (jsonReport.autoFixDetails) {
-    lines.push('## Auto-Fix Details');
+  if (jsonReport.fixDetails) {
+    const isCursorAgent = jsonReport.healingMethod === 'cursor-agent';
+    lines.push(`## ${isCursorAgent ? 'Cursor Agent' : 'Auto-Fix'} Details`);
     lines.push('');
-    lines.push(`| Locator Key | Old Selector | New Selector | Confidence | Score | Reasoning |`);
-    lines.push(`|-------------|-------------|-------------|------------|-------|-----------|`);
-    for (const f of jsonReport.autoFixDetails.fixes) {
-      lines.push(`| \`${f.locatorKey}\` | \`${f.failedLocator}\` | \`${f.newSelector || 'N/A'}\` | ${f.confidence || 'N/A'} | ${f.score || 'N/A'} | ${f.reasoning || f.status} |`);
+
+    if (isCursorAgent) {
+      lines.push(`| Locator Key | Failed Selector | Status | Duration |`);
+      lines.push(`|-------------|----------------|--------|----------|`);
+      for (const f of jsonReport.fixDetails.fixes) {
+        const duration = f.durationMs ? `${(f.durationMs / 1000).toFixed(1)}s` : 'N/A';
+        lines.push(`| \`${f.locatorKey}\` | \`${f.failedLocator}\` | ${f.status} | ${duration} |`);
+      }
+    } else {
+      lines.push(`| Locator Key | Old Selector | New Selector | Confidence | Score | Reasoning |`);
+      lines.push(`|-------------|-------------|-------------|------------|-------|-----------|`);
+      for (const f of jsonReport.fixDetails.fixes) {
+        lines.push(`| \`${f.locatorKey}\` | \`${f.failedLocator}\` | \`${f.newSelector || 'N/A'}\` | ${f.confidence || 'N/A'} | ${f.score || 'N/A'} | ${f.reasoning || f.status} |`);
+      }
     }
     lines.push('');
+
+    if (isCursorAgent) {
+      const agentFixes = jsonReport.fixDetails.fixes.filter((f) => f.prompt);
+      if (agentFixes.length > 0) {
+        lines.push('## Agent Prompts (excerpts)');
+        lines.push('');
+        for (const f of agentFixes) {
+          lines.push(`### ${f.locatorKey}`);
+          lines.push('');
+          lines.push('```');
+          lines.push(f.prompt || 'N/A');
+          lines.push('```');
+          lines.push('');
+        }
+      }
+    }
   }
 
   if (jsonReport.changes.some((c) => c.changed)) {
@@ -211,9 +248,11 @@ export function printReportSummary(report) {
     return;
   }
 
+  const method = report.healingMethod || 'unknown';
   console.log('\n  ╔═══════════════════════════════════════════════════╗');
-  console.log('  ║          SELF-HEALING REPORT                       ║');
+  console.log('  ║          AI SELF-HEALING REPORT                     ║');
   console.log('  ╠═══════════════════════════════════════════════════╣');
+  console.log(`  ║  Healing method:   ${method.padEnd(8)}                    ║`);
   console.log(`  ║  Verify result:    ${report.verifyResult.padEnd(8)}                    ║`);
   console.log(`  ║  Total failures:   ${String(report.totalFailures).padStart(4)}                        ║`);
   console.log(`  ║  Locators fixed:   ${String(report.totalChanges).padStart(4)}                        ║`);

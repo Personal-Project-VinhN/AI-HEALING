@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "test": "npx playwright test tests/traditional/ --reporter=list",
+    "generate-locators": "node run-healing.js generate",
     "heal": "node run-healing.js",
     "heal:collect": "node run-healing.js collect",
-    "heal:fix": "node run-healing.js fix",
+    "heal:fix-rule": "node run-healing.js fix-rule",
     "heal:clean": "node run-healing.js clean",
     "report": "npx playwright show-report",
     "report:healing": "node run-healing.js report"

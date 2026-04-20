@@ -271,7 +271,7 @@ export async function collectAllContexts(options = {}) {
 
   await browser.close();
 
-  printCursorInstructions(contextFiles);
+  console.log(`\n  📋 ${contextFiles.length} context file(s) ready for Cursor Agent healing.`);
 
   return { success: true, healed: contextFiles.length, contextFiles };
 }
