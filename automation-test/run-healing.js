@@ -284,7 +284,7 @@ async function cleanUp() {
  */
 async function runHealing() {
   banner('AI SELF-HEALING AUTOMATION');
-  console.log('  Flow: Run Tests → Fail → Collect → Cursor Agent Heal → Verify → Report\n');
+  console.log('  Flow: Run Tests → Fail → Collect → AI Heal (Agent/Rule) → Verify → Report\n');
 
   const server = await startServer();
 
@@ -314,24 +314,30 @@ async function runHealing() {
     }
 
     phase(3, 'Cursor Agent healing (LLM-powered)');
-    const fixResult = await cursorAgentHeal();
+    let fixResult = await cursorAgentHeal();
     let verifySuccess = false;
 
     if (fixResult.totalFixed === 0) {
       console.log('\n  ⚠️  Cursor Agent could not fix locators.');
-      if (fixResult.error === 'Agent CLI not available') {
-        console.log('  💡 Tip: Use "npm run heal:fix-rule" for rule-based fallback.');
-      }
-    } else {
+      console.log('  🔄 Auto-fallback to rule-based healing...\n');
+
+      phase('3b', 'Rule-based healing (fallback)');
+      fixResult = await autoFixRule();
+      fixResult.healingMethod = 'rule-based (auto-fallback)';
+    }
+
+    if (fixResult.totalFixed > 0) {
       phase(4, 'Verify fixes');
       const verifyResult = runTests();
       verifySuccess = verifyResult.success;
 
       if (verifySuccess) {
-        console.log('\n  ✅ All tests passed after AI healing!');
+        console.log('\n  ✅ All tests passed after healing!');
       } else {
         console.log('\n  ⚠️  Some tests still failing (may be non-locator issues).');
       }
+    } else {
+      console.log('\n  ❌ No locators could be fixed by any method.');
     }
 
     phase(5, 'Generate report');
