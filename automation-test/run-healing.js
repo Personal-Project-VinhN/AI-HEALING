@@ -1,149 +1,338 @@
-import { execSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import http from 'http';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONTEXT_DIR = path.join(__dirname, 'healing-context');
+const MAIN_APP_DIR = path.join(__dirname, '..', 'main-app');
 
 /**
- * Main orchestration script for the Cursor Self-Healing flow.
+ * Self-Healing orchestrator.
+ *
+ * Automated flow:
+ *   1. Start app server
+ *   2. Run tests (expect FAIL with broken locators)
+ *   3. Collect DOM context for each broken locator
+ *   4. Auto-fix: analyze DOM and patch locator/profile files
+ *   5. Re-run tests (expect PASS)
+ *   6. Generate report with all changes
  *
  * Commands:
- *   node run-healing.js              - Full flow: test V2 -> collect context -> instructions
- *   node run-healing.js collect      - Only collect DOM context (skip test run)
- *   node run-healing.js report       - Generate report after Cursor fixes
- *   node run-healing.js clean        - Clean up context files
- *   node run-healing.js demo         - Full demo: V1 pass -> V2 fail -> context -> instructions
+ *   node run-healing.js            - Full auto flow
+ *   node run-healing.js collect    - Only collect DOM context
+ *   node run-healing.js fix        - Only auto-fix from existing context
+ *   node run-healing.js report     - Generate report
+ *   node run-healing.js clean      - Clean context files
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
 
-const DIVIDER = '═'.repeat(62);
+const PORT = 3001;
 
-function runCommand(cmd, description, allowFail = false) {
-  console.log(`\n  ${DIVIDER}`);
-  console.log(`  ${description}`);
-  console.log(`  ${DIVIDER}`);
+/**
+ * Check if port is in use.
+ *
+ * @param {number} port
+ * @returns {Promise<boolean>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function isPortInUse(port) {
+  return new Promise((resolve) => {
+    const req = http.get(`http://localhost:${port}`, () => resolve(true));
+    req.on('error', () => resolve(false));
+    req.setTimeout(2000, () => { req.destroy(); resolve(false); });
+  });
+}
 
+/**
+ * Wait until port responds.
+ *
+ * @param {number} port
+ * @param {number} timeoutMs
+ * @returns {Promise<boolean>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function waitForPort(port, timeoutMs = 30000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    if (await isPortInUse(port)) return true;
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  return false;
+}
+
+/**
+ * Start main-app dev server.
+ *
+ * @returns {Promise<import('child_process').ChildProcess|null>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function startServer() {
+  if (await isPortInUse(PORT)) {
+    console.log(`  ✅ Server already running on port ${PORT}`);
+    return null;
+  }
+
+  console.log(`  🚀 Starting main-app on port ${PORT}...`);
+  const child = spawn('npm', ['run', 'dev'], {
+    cwd: MAIN_APP_DIR,
+    shell: true,
+    stdio: 'pipe',
+    detached: false,
+  });
+
+  child.stdout.on('data', () => {});
+  child.stderr.on('data', () => {});
+
+  const ready = await waitForPort(PORT);
+  if (!ready) {
+    console.log('  ❌ Server failed to start within 30s');
+    child.kill();
+    return null;
+  }
+
+  console.log(`  ✅ Server ready on port ${PORT}`);
+  return child;
+}
+
+/**
+ * Stop server process.
+ *
+ * @param {import('child_process').ChildProcess|null} child
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function stopServer(child) {
+  if (!child) return;
   try {
-    execSync(cmd, {
-      stdio: 'inherit',
-      env: { ...process.env },
-      cwd: __dirname,
-    });
+    process.kill(-child.pid, 'SIGTERM');
+  } catch {
+    try { child.kill('SIGTERM'); } catch { /* ignore */ }
+  }
+  console.log('  🛑 Server stopped');
+}
+
+/**
+ * Run a shell command with formatted output.
+ *
+ * @param {string} cmd
+ * @param {string} description
+ * @param {boolean} [allowFail]
+ * @returns {{ success: boolean, exitCode?: number }}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function runCommand(cmd, description, allowFail = false) {
+  console.log(`\n  ──── ${description} ────`);
+  try {
+    execSync(cmd, { stdio: 'inherit', cwd: __dirname });
     return { success: true };
   } catch (error) {
-    if (!allowFail) {
-      return { success: false, exitCode: error.status };
-    }
-    return { success: false, exitCode: error.status, expected: true };
+    if (allowFail) return { success: false, exitCode: error.status };
+    return { success: false, exitCode: error.status };
   }
 }
 
-async function runTestsV2() {
-  console.log('\n');
-  console.log('  ╔══════════════════════════════════════════════════════════════╗');
-  console.log('  ║                                                              ║');
-  console.log('  ║   CURSOR SELF-HEALING - STEP 1: Run Tests on V2             ║');
-  console.log('  ║                                                              ║');
-  console.log('  ╚══════════════════════════════════════════════════════════════╝');
+function banner(text) {
+  const line = '═'.repeat(60);
+  console.log(`\n  ╔${line}╗`);
+  console.log(`  ║  ${text.padEnd(58)}║`);
+  console.log(`  ╚${line}╝`);
+}
 
-  if (fs.existsSync(CONTEXT_DIR)) {
-    const files = fs.readdirSync(CONTEXT_DIR).filter((f) => f.endsWith('.json'));
-    for (const f of files) {
-      fs.unlinkSync(path.join(CONTEXT_DIR, f));
-    }
-  }
+function phase(num, title) {
+  console.log(`\n  ── STEP ${num}: ${title} ──`);
+}
 
-  const result = runCommand(
-    'npx cross-env UI_VERSION=2 npx playwright test tests/traditional/ --reporter=./utils/healingReporter.js,list',
-    '  Running tests with V2 UI (locators expected to fail)...',
+/**
+ * Clear old context files.
+ *
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function clearContext() {
+  if (!fs.existsSync(CONTEXT_DIR)) return;
+  const files = fs.readdirSync(CONTEXT_DIR).filter((f) => f.endsWith('.json'));
+  for (const f of files) fs.unlinkSync(path.join(CONTEXT_DIR, f));
+}
+
+/**
+ * Run tests against the running app.
+ *
+ * @returns {{ success: boolean }}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function runTests() {
+  return runCommand(
+    'npx playwright test tests/traditional/ --reporter=list',
+    'Running tests...',
     true
   );
-
-  return result;
 }
 
+/**
+ * Run tests with healing reporter to capture failures.
+ *
+ * @returns {{ success: boolean }}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function runTestsWithReporter() {
+  return runCommand(
+    'npx playwright test tests/traditional/ --reporter=./utils/healingReporter.js,list',
+    'Running tests (with failure detection)...',
+    true
+  );
+}
+
+/**
+ * Collect DOM context for broken locators.
+ *
+ * @returns {Promise<object>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
 async function collectContexts() {
-  console.log('\n');
-  console.log('  ╔══════════════════════════════════════════════════════════════╗');
-  console.log('  ║                                                              ║');
-  console.log('  ║   CURSOR SELF-HEALING - STEP 2: Collect DOM Context          ║');
-  console.log('  ║                                                              ║');
-  console.log('  ╚══════════════════════════════════════════════════════════════╝');
-
   const { collectAllContexts } = await import('./utils/cursorHealing.js');
-  const result = await collectAllContexts();
-  return result;
+  return collectAllContexts();
 }
 
-async function generateReport(verifyResult = 'unknown') {
-  console.log('\n');
-  console.log('  ╔══════════════════════════════════════════════════════════════╗');
-  console.log('  ║                                                              ║');
-  console.log('  ║   CURSOR SELF-HEALING - Generate Report                      ║');
-  console.log('  ║                                                              ║');
-  console.log('  ╚══════════════════════════════════════════════════════════════╝');
+/**
+ * Auto-fix locators from context files.
+ *
+ * @returns {Promise<object>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function autoFix() {
+  const { runAutoFix } = await import('./utils/autoFix.js');
+  return runAutoFix();
+}
 
-  const { generateJsonReport, generateMarkdownReport, printReportSummary } = await import('./utils/healingReport.js');
-  const jsonReport = await generateJsonReport({ verifyResult });
+/**
+ * Generate healing report.
+ *
+ * @param {string} verifyResult
+ * @param {object} [fixResult]
+ * @returns {Promise<void>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function generateReport(verifyResult = 'unknown', fixResult = null) {
+  const { generateJsonReport, generateMarkdownReport, printReportSummary } =
+    await import('./utils/healingReport.js');
+
+  const jsonReport = await generateJsonReport({ verifyResult, fixResult });
   if (jsonReport) {
     const mdPath = generateMarkdownReport(jsonReport);
     printReportSummary(jsonReport);
-    if (mdPath) {
-      console.log(`\n  📄 Markdown report: ${mdPath}`);
-    }
+    if (mdPath) console.log(`\n  📄 Report: ${mdPath}`);
   }
 }
 
+/**
+ * Clean up context files.
+ *
+ * @returns {Promise<void>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
 async function cleanUp() {
   const { cleanupContextFiles } = await import('./utils/healingReport.js');
   cleanupContextFiles();
 }
 
-async function runDemo() {
-  console.log('\n');
-  console.log('  ╔══════════════════════════════════════════════════════════════╗');
-  console.log('  ║                                                              ║');
-  console.log('  ║   CURSOR SELF-HEALING DEMO                                  ║');
-  console.log('  ║   Demonstrates: V1 pass -> V2 fail -> Context -> Fix        ║');
-  console.log('  ║                                                              ║');
-  console.log('  ╚══════════════════════════════════════════════════════════════╝');
+/**
+ * Full automated self-healing flow.
+ *
+ * @returns {Promise<void>}
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+async function runHealing() {
+  banner('SELF-HEALING AUTOMATION');
+  console.log('  Flow: Run Tests → Fail → Collect → Fix → Verify → Report\n');
 
-  console.log('\n  ── PHASE 1: Verify V1 tests pass ──');
-  const v1Result = runCommand(
-    'npx cross-env UI_VERSION=1 npx playwright test tests/traditional/ --reporter=list',
-    '  V1 UI + Traditional Tests (expect: ALL PASS)',
-    false
-  );
+  const server = await startServer();
 
-  if (!v1Result.success) {
-    console.log('\n  ❌ V1 tests failed! Tests themselves have issues. Fix tests first.');
-    return;
+  try {
+    phase(1, 'Run tests');
+    clearContext();
+    const testResult = runTestsWithReporter();
+
+    if (testResult.success) {
+      console.log('\n  ✅ All tests passed. No healing needed.');
+      return;
+    }
+    console.log('\n  ❌ Tests failed — starting self-healing...');
+
+    phase(2, 'Collect DOM context for broken locators');
+    const collectResult = await collectContexts();
+
+    if (!collectResult || collectResult.healed === 0) {
+      console.log('\n  ⚠️  No broken locators detected. Failures may be non-locator issues.');
+      return;
+    }
+
+    phase(3, 'Auto-fix locators');
+    const fixResult = await autoFix();
+    let verifySuccess = false;
+
+    if (fixResult.totalFixed === 0) {
+      console.log('\n  ⚠️  No locators could be auto-fixed. Manual review required.');
+    } else {
+      phase(4, 'Verify fixes');
+      const verifyResult = runTests();
+      verifySuccess = verifyResult.success;
+
+      if (verifySuccess) {
+        console.log('\n  ✅ All tests passed after healing!');
+      } else {
+        console.log('\n  ⚠️  Some tests still failing (may be non-locator issues).');
+      }
+    }
+
+    phase(5, 'Generate report');
+    await generateReport(verifySuccess ? 'PASS' : 'FAIL', fixResult);
+
+    console.log('');
+    if (verifySuccess) {
+      banner('HEALING COMPLETE — ALL TESTS PASSING');
+    } else {
+      banner('HEALING INCOMPLETE — MANUAL REVIEW NEEDED');
+    }
+
+    console.log('\n  Modified files:');
+    console.log('    - locators/login.locators.js');
+    console.log('    - locators/dashboard.locators.js');
+    console.log('    - profiles/login.profiles.js');
+    console.log('    - profiles/dashboard.profiles.js');
+    console.log('\n  Reports: healing-reports/*.md\n');
+
+  } finally {
+    stopServer(server);
   }
-  console.log('\n  ✅ V1 tests all passed. Tests are correct.\n');
-
-  console.log('\n  ── PHASE 2: Run V2 tests (expect failures) ──');
-  await runTestsV2();
-
-  console.log('\n  ── PHASE 3: Collect DOM context for failures ──');
-  await collectContexts();
-
-  console.log('\n  ── NEXT STEPS ──');
-  console.log('  1. Copy the prompt above into Cursor Agent chat');
-  console.log('  2. Let Cursor Agent analyze context and fix locators');
-  console.log('  3. Run: npm run test:v2');
-  console.log('  4. If all pass, run: npm run report:healing');
-  console.log('');
 }
 
+// --- CLI ---
 const command = process.argv[2] || 'default';
 
 switch (command) {
   case 'collect':
-    collectContexts();
+    (async () => {
+      const s = await startServer();
+      try { await collectContexts(); } finally { stopServer(s); }
+    })();
+    break;
+  case 'fix':
+    autoFix();
     break;
   case 'report':
     generateReport(process.argv[3] || 'unknown');
@@ -151,13 +340,7 @@ switch (command) {
   case 'clean':
     cleanUp();
     break;
-  case 'demo':
-    runDemo();
-    break;
   default:
-    (async () => {
-      await runTestsV2();
-      await collectContexts();
-    })();
+    runHealing();
     break;
 }

@@ -3,13 +3,11 @@ import { useState, createContext } from 'react';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
-import { getUIVersion } from './config/uiVersion';
 
 export const AppContext = createContext();
 
 /**
  * Root application component with routing and auth state.
- * Provides UI version context to all child components.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
@@ -17,7 +15,6 @@ export const AppContext = createContext();
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const uiVersion = getUIVersion();
 
   const login = (username) => {
     setIsLoggedIn(true);
@@ -30,7 +27,7 @@ export default function App() {
   };
 
   return (
-    <AppContext.Provider value={{ isLoggedIn, currentUser, login, logout, uiVersion }}>
+    <AppContext.Provider value={{ isLoggedIn, currentUser, login, logout }}>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />

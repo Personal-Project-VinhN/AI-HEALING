@@ -3,8 +3,8 @@ import { loginLocators } from '../../locators/login.locators.js';
 import { profileLocators, dashboardLocators } from '../../locators/dashboard.locators.js';
 
 /**
- * Traditional form submission tests using hardcoded V1 locators.
- * PASS on UI V1, FAIL on UI V2.
+ * Form submission tests using locators from locator files.
+ * These will fail when UI changes, then heal automatically.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>

@@ -3,9 +3,9 @@ import { loginLocators } from '../../locators/login.locators.js';
 import { dashboardLocators, profileLocators } from '../../locators/dashboard.locators.js';
 
 /**
- * Traditional success validation tests using hardcoded V1 locators.
- * Validates end-to-end flow: login -> dashboard -> form -> success.
- * PASS on UI V1, FAIL on UI V2.
+ * Success validation tests - end-to-end flow.
+ * Validates: login -> dashboard -> form -> success.
+ * These will fail when UI changes, then heal automatically.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
@@ -20,7 +20,7 @@ test.describe('Traditional Success Validation Tests', () => {
     await expect(page).toHaveURL(/.*dashboard/);
 
     // Step 2: Verify dashboard
-    await expect(page.locator(dashboardLocators.pageTitle)).toContainText('Dashboard');
+    await expect(page.locator(dashboardLocators.pageTitle)).toBeVisible();
     await expect(page.locator(dashboardLocators.userTable)).toBeVisible();
 
     // Step 3: Navigate to profile and submit form

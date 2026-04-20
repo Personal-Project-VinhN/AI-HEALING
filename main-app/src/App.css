@@ -43,17 +43,6 @@ body {
   font-size: 0.9rem;
 }
 
-.version-badge {
-  display: inline-block;
-  background: #667eea;
-  color: white;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  margin-left: 8px;
-  vertical-align: middle;
-}
-
 .form-group {
   margin-bottom: 1.25rem;
 }

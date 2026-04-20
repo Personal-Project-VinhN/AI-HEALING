@@ -1,6 +1,3 @@
-import { useContext } from 'react';
-import { AppContext } from '../App';
-
 const SAMPLE_DATA = [
   { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin', status: 'active' },
   { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'Editor', status: 'active' },
@@ -10,27 +7,22 @@ const SAMPLE_DATA = [
 ];
 
 /**
- * Data table component showing user list.
- * V1: id="user-table", columns: Name/Email/Role/Status
- * V2: id="members-table", columns: Full Name/Email Address/Position/State
+ * Data table component showing team members list.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
 export default function DataTable() {
-  const { uiVersion } = useContext(AppContext);
-  const isV1 = uiVersion === 1;
-
   return (
     <div className="data-table-container">
-      <h3>{isV1 ? 'User List' : 'Team Members'}</h3>
-      <table className="data-table" id={isV1 ? 'user-table' : 'members-table'} data-testid="data-table">
+      <h3>Team Members</h3>
+      <table className="data-table" id="members-table" data-testid="data-table">
         <thead>
           <tr>
-            <th>{isV1 ? 'Name' : 'Full Name'}</th>
-            <th>{isV1 ? 'Email' : 'Email Address'}</th>
-            <th>{isV1 ? 'Role' : 'Position'}</th>
-            <th>{isV1 ? 'Status' : 'State'}</th>
+            <th>Full Name</th>
+            <th>Email Address</th>
+            <th>Position</th>
+            <th>State</th>
           </tr>
         </thead>
         <tbody>
@@ -41,9 +33,7 @@ export default function DataTable() {
               <td>{user.role}</td>
               <td>
                 <span className={`badge badge-${user.status}`}>
-                  {user.status === 'active'
-                    ? (isV1 ? 'Active' : 'Enabled')
-                    : (isV1 ? 'Inactive' : 'Disabled')}
+                  {user.status === 'active' ? 'Enabled' : 'Disabled'}
                 </span>
               </td>
             </tr>

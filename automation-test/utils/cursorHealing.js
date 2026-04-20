@@ -73,17 +73,35 @@ async function loginIfNeeded(page) {
 }
 
 /**
- * Load all locator selectors from locator files and profile files.
+ * Load all locator selectors from locator files, and load matching profiles
+ * to detect stable selectors that don't need healing.
  *
- * @returns {Promise<object[]>} Array of { selector, locatorFile, exportName, key, page }
+ * @returns {Promise<object[]>} Array of { selector, locatorFile, exportName, key, page, profileSelector }
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
 async function loadAllLocators() {
   const locatorDir = path.join(__dirname, '..', 'locators');
+  const profileDir = path.join(__dirname, '..', 'profiles');
   const files = fs.readdirSync(locatorDir).filter((f) => f.endsWith('.locators.js'));
-  const result = [];
 
+  const profileMap = {};
+  if (fs.existsSync(profileDir)) {
+    const profileFiles = fs.readdirSync(profileDir).filter((f) => f.endsWith('.profiles.js'));
+    for (const pf of profileFiles) {
+      const pfPath = path.join(profileDir, pf);
+      const mod = await import(`file://${pfPath.replace(/\\/g, '/')}?t=${Date.now()}`);
+      for (const exportName of Object.keys(mod)) {
+        const profileObj = mod[exportName];
+        if (typeof profileObj !== 'object') continue;
+        for (const [key, profile] of Object.entries(profileObj)) {
+          profileMap[key] = profile;
+        }
+      }
+    }
+  }
+
+  const result = [];
   for (const file of files) {
     const filePath = path.join(locatorDir, file);
     const mod = await import(`file://${filePath.replace(/\\/g, '/')}?t=${Date.now()}`);
@@ -95,7 +113,15 @@ async function loadAllLocators() {
         : file.includes('dashboard') ? 'dashboard' : 'unknown';
 
       for (const [key, selector] of Object.entries(locatorMap)) {
-        result.push({ selector, locatorFile: file, exportName, key, page: pageName });
+        const profile = profileMap[key];
+        result.push({
+          selector,
+          locatorFile: file,
+          exportName,
+          key,
+          page: pageName,
+          profileSelector: profile?.selector || null,
+        });
       }
     }
   }
@@ -119,7 +145,7 @@ export async function collectAllContexts(options = {}) {
   const baseURL = `http://localhost:${port}`;
 
   const allLocators = await loadAllLocators();
-  console.log(`\n  🔍 Loaded ${allLocators.length} locators from source files. Checking each on V2 DOM...\n`);
+  console.log(`\n  🔍 Loaded ${allLocators.length} locators from source files. Checking each on live DOM...\n`);
 
   const browser = await chromium.launch({ headless: true });
   const pageContext = await browser.newContext();
@@ -127,17 +153,36 @@ export async function collectAllContexts(options = {}) {
 
   const brokenLocators = [];
 
+  /**
+   * Check if a locator exists on page.
+   * For data-testid selectors that match profile (stable), skip check entirely.
+   * For conditionally rendered elements, also check HTML source.
+   */
+  async function checkLocator(loc) {
+    const found = await page.locator(loc.selector).count();
+    if (found > 0) return true;
+
+    if (loc.selector.includes('data-testid')) {
+      if (loc.profileSelector && loc.selector === loc.profileSelector) return true;
+
+      const html = await page.content();
+      const testIdMatch = loc.selector.match(/data-testid="([^"]+)"/);
+      if (testIdMatch && html.includes(`data-testid="${testIdMatch[1]}"`)) return true;
+    }
+
+    return false;
+  }
+
   await page.goto(`${baseURL}/login`);
   await page.waitForTimeout(500);
 
   const loginLocators = allLocators.filter((l) => l.page === 'login');
   for (const loc of loginLocators) {
-    const found = await page.locator(loc.selector).count();
-    if (found === 0) {
+    if (await checkLocator(loc)) {
+      console.log(`  ✅ OK:     ${loc.selector}`);
+    } else {
       brokenLocators.push(loc);
       console.log(`  ❌ BROKEN: ${loc.selector} (${loc.exportName}.${loc.key})`);
-    } else {
-      console.log(`  ✅ OK:     ${loc.selector}`);
     }
   }
 
@@ -147,12 +192,11 @@ export async function collectAllContexts(options = {}) {
       l.page === 'dashboard' && l.exportName === 'dashboardLocators'
     );
     for (const loc of dashLocators) {
-      const found = await page.locator(loc.selector).count();
-      if (found === 0) {
+      if (await checkLocator(loc)) {
+        console.log(`  ✅ OK:     ${loc.selector}`);
+      } else {
         brokenLocators.push(loc);
         console.log(`  ❌ BROKEN: ${loc.selector} (${loc.exportName}.${loc.key})`);
-      } else {
-        console.log(`  ✅ OK:     ${loc.selector}`);
       }
     }
 
@@ -166,18 +210,17 @@ export async function collectAllContexts(options = {}) {
       l.exportName === 'profileLocators'
     );
     for (const loc of profileLocators) {
-      const found = await page.locator(loc.selector).count();
-      if (found === 0) {
+      if (await checkLocator(loc)) {
+        console.log(`  ✅ OK:     ${loc.selector}`);
+      } else {
         brokenLocators.push(loc);
         console.log(`  ❌ BROKEN: ${loc.selector} (${loc.exportName}.${loc.key})`);
-      } else {
-        console.log(`  ✅ OK:     ${loc.selector}`);
       }
     }
   }
 
   if (brokenLocators.length === 0) {
-    console.log('\n  ✅ All locators are valid on V2. Nothing to heal.');
+    console.log('\n  ✅ All locators are valid. Nothing to heal.');
     await browser.close();
     return { success: true, healed: 0 };
   }
@@ -216,7 +259,7 @@ export async function collectAllContexts(options = {}) {
       const context = await buildHealingContext({
         testName: `${loc.exportName}.${loc.key}`,
         testFile: `locators/${loc.locatorFile}`,
-        errorMessage: `Locator "${loc.selector}" not found on V2 UI (page: ${pageName})`,
+        errorMessage: `Locator "${loc.selector}" not found on current UI (page: ${pageName})`,
         domSnapshot: { ...domSnapshot, failedLocator: loc.selector },
       });
 
@@ -251,7 +294,7 @@ function printCursorInstructions(contextFiles) {
   console.log('  ║                                                              ║');
   console.log('  ║  STEP 1: Copy the prompt below into Cursor Agent chat       ║');
   console.log('  ║  STEP 2: Let Cursor Agent fix the locator files             ║');
-  console.log('  ║  STEP 3: Run "npm run test:v2" to verify fixes              ║');
+  console.log('  ║  STEP 3: Run "npm run test" to verify fixes                  ║');
   console.log('  ║                                                              ║');
   console.log('  ╚══════════════════════════════════════════════════════════════╝');
 

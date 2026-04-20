@@ -54,7 +54,7 @@ async function readCurrentLocators() {
  * @lastupdate Gin<gin_vn@haldata.net>
  */
 export async function generateJsonReport(options = {}) {
-  const { verifyResult = 'unknown' } = options;
+  const { verifyResult = 'unknown', fixResult = null } = options;
 
   if (!fs.existsSync(REPORT_DIR)) {
     fs.mkdirSync(REPORT_DIR, { recursive: true });
@@ -100,6 +100,21 @@ export async function generateJsonReport(options = {}) {
     totalChanges: changes.filter((c) => c.changed).length,
     unchangedCount: changes.filter((c) => !c.changed).length,
     changes,
+    autoFixDetails: fixResult ? {
+      totalProcessed: fixResult.totalProcessed,
+      totalFixed: fixResult.totalFixed,
+      totalSkipped: fixResult.totalSkipped,
+      fixes: (fixResult.fixes || []).map((f) => ({
+        locatorKey: f.locatorKey,
+        failedLocator: f.failedLocator,
+        newSelector: f.newSelector,
+        confidence: f.confidence,
+        score: f.score,
+        reasoning: f.reasoning,
+        status: f.status,
+        patchedFiles: f.patchedFiles,
+      })),
+    } : null,
   };
 
   const reportPath = path.join(REPORT_DIR, `healing-report-${Date.now()}.json`);
@@ -147,6 +162,17 @@ export function generateMarkdownReport(jsonReport) {
     for (const c of jsonReport.changes) {
       const status = c.changed ? 'FIXED' : 'UNCHANGED';
       lines.push(`| ${c.testName} | \`${c.locatorKey}\` | \`${c.oldSelector}\` | \`${c.newSelector}\` | ${status} |`);
+    }
+    lines.push('');
+  }
+
+  if (jsonReport.autoFixDetails) {
+    lines.push('## Auto-Fix Details');
+    lines.push('');
+    lines.push(`| Locator Key | Old Selector | New Selector | Confidence | Score | Reasoning |`);
+    lines.push(`|-------------|-------------|-------------|------------|-------|-----------|`);
+    for (const f of jsonReport.autoFixDetails.fixes) {
+      lines.push(`| \`${f.locatorKey}\` | \`${f.failedLocator}\` | \`${f.newSelector || 'N/A'}\` | ${f.confidence || 'N/A'} | ${f.score || 'N/A'} | ${f.reasoning || f.status} |`);
     }
     lines.push('');
   }
@@ -213,17 +239,20 @@ export function printReportSummary(report) {
 export function cleanupContextFiles() {
   if (!fs.existsSync(CONTEXT_DIR)) return;
 
-  const files = fs.readdirSync(CONTEXT_DIR);
-  for (const file of files) {
-    fs.unlinkSync(path.join(CONTEXT_DIR, file));
-  }
-
   const snapshotDir = path.join(CONTEXT_DIR, 'snapshots');
   if (fs.existsSync(snapshotDir)) {
     const snapshots = fs.readdirSync(snapshotDir);
     for (const s of snapshots) {
-      fs.unlinkSync(path.join(snapshotDir, s));
+      const sp = path.join(snapshotDir, s);
+      if (fs.statSync(sp).isFile()) fs.unlinkSync(sp);
     }
+    fs.rmdirSync(snapshotDir);
+  }
+
+  const files = fs.readdirSync(CONTEXT_DIR);
+  for (const file of files) {
+    const fp = path.join(CONTEXT_DIR, file);
+    if (fs.statSync(fp).isFile()) fs.unlinkSync(fp);
   }
 
   console.log('  🧹 Cleaned up healing context files.');

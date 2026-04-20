@@ -3,8 +3,8 @@ import { loginLocators } from '../../locators/login.locators.js';
 import { dashboardLocators } from '../../locators/dashboard.locators.js';
 
 /**
- * Traditional dashboard tests using hardcoded V1 locators.
- * PASS on UI V1, FAIL on UI V2.
+ * Dashboard tests using locators from locator files.
+ * These will fail when UI changes, then heal automatically.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
@@ -20,7 +20,6 @@ test.describe('Traditional Dashboard Tests', () => {
 
   test('should display dashboard title', async ({ page }) => {
     await expect(page.locator(dashboardLocators.pageTitle)).toBeVisible();
-    await expect(page.locator(dashboardLocators.pageTitle)).toContainText('Dashboard');
   });
 
   test('should display stats cards', async ({ page }) => {

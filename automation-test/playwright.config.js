@@ -1,19 +1,12 @@
 import { defineConfig } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 /**
- * Playwright config for Cursor Self-Healing automation tests.
- * Supports UI_VERSION=1|2 via environment variable.
- * The webServer auto-starts main-app on port 3001.
+ * Playwright config for Self-Healing automation tests.
+ * Expects main-app to be running on port 3001 before tests start.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const uiVersion = process.env.UI_VERSION || '1';
-const mainAppDir = path.resolve(__dirname, '..', 'main-app');
 
 export default defineConfig({
   testDir: './tests',
@@ -35,14 +28,4 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
   ],
-  webServer: {
-    command: `npm run dev:v${uiVersion}`,
-    port: 3001,
-    cwd: mainAppDir,
-    reuseExistingServer: true,
-    timeout: 60000,
-    stdout: 'pipe',
-    stderr: 'pipe',
-  },
 });
-

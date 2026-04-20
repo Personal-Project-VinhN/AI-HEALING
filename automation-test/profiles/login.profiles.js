@@ -1,10 +1,9 @@
 /**
  * Element profiles for the Login page.
  *
- * Each profile captures the full "fingerprint" of an element as it
- * appeared in UI Version 1. When the locator fails on V2, the
- * AI-driven engine compares this profile against live DOM candidates
- * to find the best match using weighted similarity scoring.
+ * Each profile captures the "fingerprint" of an element based on its
+ * semantic properties. When a locator fails, the healing engine
+ * compares this profile against live DOM candidates to find the best match.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>

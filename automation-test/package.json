@@ -3,12 +3,10 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "test:v1": "cross-env UI_VERSION=1 npx playwright test tests/traditional/ --reporter=list",
-    "test:v2": "cross-env UI_VERSION=2 npx playwright test tests/traditional/ --reporter=list",
-    "test:v2:healing": "cross-env UI_VERSION=2 npx playwright test tests/traditional/ --reporter=./utils/healingReporter.js,list",
+    "test": "npx playwright test tests/traditional/ --reporter=list",
     "heal": "node run-healing.js",
     "heal:collect": "node run-healing.js collect",
-    "heal:demo": "node run-healing.js demo",
+    "heal:fix": "node run-healing.js fix",
     "heal:clean": "node run-healing.js clean",
     "report": "npx playwright show-report",
     "report:healing": "node run-healing.js report"

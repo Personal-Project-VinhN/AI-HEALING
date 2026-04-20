@@ -1,7 +1,6 @@
 /**
- * V1 locators for the Login page.
- * These are the "original" locators that match UI Version 1.
- * When UI switches to V2, these will BREAK.
+ * Locators for the Login page.
+ * These locators are outdated and will be healed automatically.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>

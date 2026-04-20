@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test';
 import { loginLocators } from '../../locators/login.locators.js';
 
 /**
- * Traditional login tests using hardcoded V1 locators.
- * PASS on UI V1, FAIL on UI V2 (locators changed).
+ * Login tests using locators from locator files.
+ * These will fail when UI changes, then heal automatically.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>

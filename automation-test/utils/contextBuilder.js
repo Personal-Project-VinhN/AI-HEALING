@@ -86,13 +86,13 @@ function classifyError(errorMessage) {
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
-async function findMatchingProfile(failedLocator) {
+async function findMatchingProfile(failedLocator, locatorKey = '') {
   const profileDir = path.join(__dirname, '..', 'profiles');
   const files = fs.readdirSync(profileDir).filter((f) => f.endsWith('.profiles.js'));
 
   for (const file of files) {
     const filePath = path.join(profileDir, file);
-    const mod = await import(`file://${filePath.replace(/\\/g, '/')}`);
+    const mod = await import(`file://${filePath.replace(/\\/g, '/')}?t=${Date.now()}`);
 
     for (const exportName of Object.keys(mod)) {
       const profileMap = mod[exportName];
@@ -105,6 +105,23 @@ async function findMatchingProfile(failedLocator) {
       }
     }
   }
+
+  if (locatorKey) {
+    const keyPart = locatorKey.includes('.') ? locatorKey.split('.').pop() : locatorKey;
+    for (const file of files) {
+      const filePath = path.join(profileDir, file);
+      const mod = await import(`file://${filePath.replace(/\\/g, '/')}?t=${Date.now() + 1}`);
+      for (const exportName of Object.keys(mod)) {
+        const profileMap = mod[exportName];
+        if (typeof profileMap !== 'object') continue;
+        if (profileMap[keyPart]) {
+          const profile = profileMap[keyPart];
+          return { ...profile, _profileKey: keyPart, _profileFile: file, _exportName: exportName };
+        }
+      }
+    }
+  }
+
   return null;
 }
 
@@ -156,10 +173,11 @@ export async function buildHealingContext(params) {
   const { testName, testFile, errorMessage, domSnapshot } = params;
 
   const classification = classifyError(errorMessage);
-  const failedLocator = extractLocatorFromError(errorMessage) || domSnapshot.failedLocator || '';
+  const failedLocator = domSnapshot.failedLocator || extractLocatorFromError(errorMessage) || '';
 
-  const profile = failedLocator ? await findMatchingProfile(failedLocator) : null;
   const locatorSource = failedLocator ? await findLocatorSource(failedLocator) : null;
+  const locatorKey = locatorSource ? `${locatorSource.exportName}.${locatorSource.key}` : testName;
+  const profile = failedLocator ? await findMatchingProfile(failedLocator, locatorKey) : null;
 
   const relevantElements = domSnapshot.elements.filter((el) => {
     if (!failedLocator) return true;

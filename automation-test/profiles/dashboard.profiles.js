@@ -1,9 +1,9 @@
 /**
  * Element profiles for Dashboard and Profile pages.
  *
- * Each profile captures the full "fingerprint" of an element as it
- * appeared in UI Version 1. The AI-driven engine compares these
- * against live DOM candidates using weighted similarity scoring.
+ * Each profile captures the "fingerprint" of an element based on its
+ * semantic properties. The healing engine compares these against live
+ * DOM candidates using weighted similarity scoring.
  *
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
@@ -87,6 +87,22 @@ export const dashboardProfiles = {
     attributes: { id: 'user-table', 'data-testid': 'data-table', class: 'data-table' },
     parentContext: 'div.data-table-container',
     nearbyText: ['User List', 'Name', 'Email', 'Role', 'Status'],
+  },
+
+  navDashboard: {
+    logicalName: 'navDashboard',
+    page: 'dashboard',
+    actionType: 'click',
+    selector: '#nav-dashboard',
+    tag: 'a',
+    role: 'link',
+    type: null,
+    text: 'Dashboard',
+    label: '',
+    placeholder: '',
+    attributes: { id: 'nav-dashboard', href: '/dashboard' },
+    parentContext: 'nav.navbar',
+    nearbyText: ['Dashboard', 'Profile', 'Logout'],
   },
 
   navProfile: {
