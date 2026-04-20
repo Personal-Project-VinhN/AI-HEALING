@@ -8,9 +8,11 @@ test-results/
 playwright-report/
 blob-report/
 
-# Repair artifacts (regenerated at runtime)
-repair-reports/
-automation-test/repair-reports/
+# Healing artifacts (regenerated at runtime)
+healing-context/
+healing-reports/
+automation-test/healing-context/
+automation-test/healing-reports/
 
 # OS
 .DS_Store
