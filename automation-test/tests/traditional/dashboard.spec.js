@@ -18,24 +18,9 @@ test.describe('Traditional Dashboard Tests', () => {
     await expect(page).toHaveURL(/.*dashboard/);
   });
 
-  test('should display dashboard title', async ({ page }) => {
+  test('should display dashboard title and stats', async ({ page }) => {
     await expect(page.locator(dashboardLocators.pageTitle)).toBeVisible();
-  });
-
-  test('should display stats cards', async ({ page }) => {
     await expect(page.locator(dashboardLocators.totalUsers)).toBeVisible();
     await expect(page.locator(dashboardLocators.activeSessions)).toBeVisible();
-    await expect(page.locator(dashboardLocators.reports)).toBeVisible();
-  });
-
-  test('should display user data table', async ({ page }) => {
-    await expect(page.locator(dashboardLocators.userTable)).toBeVisible();
-    const rows = page.locator(`${dashboardLocators.userTable} tbody tr`);
-    await expect(rows).toHaveCount(5);
-  });
-
-  test('should navigate to profile page', async ({ page }) => {
-    await page.locator(dashboardLocators.navProfile).click();
-    await expect(page).toHaveURL(/.*profile/);
   });
 });

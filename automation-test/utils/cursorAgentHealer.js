@@ -15,15 +15,11 @@ const AGENT_TIMEOUT_MS = 180_000;
  * Checks PATH first, then known install locations per platform.
  */
 function resolveAgentPath() {
-  const tryCmd = (cmd) => {
-    try {
-      execSync(`${cmd} --version`, { stdio: 'pipe', timeout: 10_000, shell: true });
-      return cmd;
-    } catch { return null; }
-  };
-
-  const fromPath = tryCmd('agent');
-  if (fromPath) return fromPath;
+  // Try plain 'agent' from PATH first
+  try {
+    execSync('agent --version', { stdio: 'pipe', timeout: 10_000, shell: true });
+    return 'agent';
+  } catch { /* not in PATH */ }
 
   const homeDir = os.homedir();
   const candidates = process.platform === 'win32'
@@ -32,14 +28,17 @@ function resolveAgentPath() {
         path.join(homeDir, '.cursor', 'bin', 'agent.cmd'),
       ]
     : [
+        path.join(homeDir, '.local', 'share', 'cursor-agent', 'agent'),
         path.join(homeDir, '.cursor', 'bin', 'agent'),
         '/usr/local/bin/agent',
       ];
 
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
-      const resolved = tryCmd(`"${candidate}"`);
-      if (resolved) return resolved;
+      try {
+        execSync(`"${candidate}" --version`, { stdio: 'pipe', timeout: 10_000, shell: true });
+        return candidate; // Return clean path — no surrounding quotes
+      } catch { /* try next */ }
     }
   }
 
@@ -78,20 +77,13 @@ function isCursorAgentAvailable() {
 }
 
 /**
- * Build a healing prompt from a context file for Cursor Agent.
- *
- * @param {object} context - Healing context from *.context.json
- * @returns {string} Prompt text
- * @author Gin<gin_vn@haldata.net>
- * @lastupdate Gin<gin_vn@haldata.net>
+ * Format DOM elements list for prompt.
  */
-function buildPrompt(context) {
-  const { failedLocator, profile, locatorSource, domElements, errorMessage, currentUrl } = context;
-
+function formatDomElements(domElements) {
   const relevantEls = (domElements?.relevant || []).slice(0, 20);
   const allIdEls = (domElements?.allWithId || []).slice(0, 30);
 
-  const domList = [...new Map(
+  return [...new Map(
     [...relevantEls, ...allIdEls].map((el) => [el.id || el.dataTestId || el.name || el.text, el])
   ).values()]
     .map((el) => {
@@ -108,55 +100,78 @@ function buildPrompt(context) {
       return `  - ${parts.join(' ')}`;
     })
     .join('\n');
+}
 
-  const profileInfo = profile
-    ? [
-        `  logicalName: ${profile.logicalName}`,
-        `  page: ${profile.page}`,
-        `  actionType: ${profile.actionType}`,
-        `  tag: ${profile.tag}`,
-        `  role: ${profile.role || 'N/A'}`,
-        `  label: "${profile.label || ''}"`,
-        `  placeholder: "${profile.placeholder || ''}"`,
-      ].join('\n')
-    : '  (no profile available)';
+/**
+ * Build a single batched prompt for ALL broken locators.
+ * This sends one request to the agent instead of N requests.
+ *
+ * @param {Array<object>} contexts - Array of healing contexts
+ * @returns {string} Combined prompt text
+ * @author Gin<gin_vn@haldata.net>
+ * @lastupdate Gin<gin_vn@haldata.net>
+ */
+function buildBatchPrompt(contexts) {
+  const locatorsByPage = {};
 
-  const locatorFile = locatorSource
-    ? `automation-test/${locatorSource.file}`
-    : 'automation-test/locators/';
+  for (const context of contexts) {
+    const pageUrl = context.currentUrl || 'unknown';
+    if (!locatorsByPage[pageUrl]) {
+      locatorsByPage[pageUrl] = { contexts: [], domElements: context.domElements };
+    }
+    locatorsByPage[pageUrl].contexts.push(context);
+  }
 
-  const profileFile = profile?._profileFile
-    ? `automation-test/profiles/${profile._profileFile}`
-    : 'automation-test/profiles/';
+  const filesToEdit = new Set();
+  let locatorList = '';
 
-  const locatorKey = locatorSource
-    ? `${locatorSource.exportName}.${locatorSource.key}`
-    : 'unknown';
+  for (const [pageUrl, pageData] of Object.entries(locatorsByPage)) {
+    locatorList += `\n### Page: ${pageUrl}\n`;
+    locatorList += `DOM Elements:\n${formatDomElements(pageData.domElements)}\n\n`;
+    locatorList += `Broken locators on this page:\n`;
+
+    for (const ctx of pageData.contexts) {
+      const { failedLocator, profile, locatorSource } = ctx;
+      const locatorKey = locatorSource
+        ? `${locatorSource.exportName}.${locatorSource.key}`
+        : 'unknown';
+      const locatorFile = locatorSource ? `automation-test/${locatorSource.file}` : '';
+      const profileFile = profile?._profileFile ? `automation-test/profiles/${profile._profileFile}` : '';
+
+      if (locatorFile) filesToEdit.add(locatorFile);
+      if (profileFile) filesToEdit.add(profileFile);
+
+      locatorList += `\n- **${locatorKey}**: \`${failedLocator}\`\n`;
+      if (profile) {
+        locatorList += `  Profile: tag=${profile.tag}, label="${profile.label || ''}", placeholder="${profile.placeholder || ''}", role=${profile.role || 'N/A'}\n`;
+      }
+      locatorList += `  File: \`${locatorFile}\` key=\`${locatorSource?.key || ''}\`\n`;
+      locatorList += `  Profile file: \`${profileFile}\`\n`;
+    }
+  }
 
   return `You are a Self-Healing Test Automation Engineer.
 
-A Playwright test is failing because the locator \`${failedLocator}\` no longer exists in the current DOM.
+Multiple Playwright test locators are broken and need to be fixed. Below is the list of ALL broken locators grouped by page, along with the current DOM elements on each page.
 
-## Failure Info
-- Locator key: ${locatorKey}
-- Page URL: ${currentUrl}
-- Error: ${errorMessage.substring(0, 300)}
+## Files to edit
+${[...filesToEdit].map((f) => `- \`${f}\``).join('\n')}
 
-## Element Profile (semantic fingerprint)
-${profileInfo}
-
-## Current DOM Elements on the page
-${domList}
+## Broken Locators
+${locatorList}
 
 ## Task
-1. Analyze the DOM elements above and find the element that best matches the profile.
-2. Determine the correct new CSS selector for that element (prefer #id > [data-testid] > [name]).
-3. In file \`${locatorFile}\`, find the key \`${locatorSource?.key || 'unknown'}\` and update its selector value from \`${failedLocator}\` to the new selector.
-4. In file \`${profileFile}\`, find the matching profile entry and update:
-   - The \`selector\` field to the new selector
-   - The \`id\` inside \`attributes\` if the selector is an ID selector
-5. Do NOT change any other fields, structure, or formatting.
-6. Do NOT create new files.`;
+For EACH broken locator above:
+1. Match it to the correct DOM element using the profile info (tag, label, placeholder, role).
+2. Determine the new CSS selector (prefer #id > [data-testid] > [name]).
+3. Update the locator file: change the selector value from the old to the new.
+4. Update the profile file: change the \`selector\` field and \`id\` in \`attributes\` if applicable.
+
+Rules:
+- Fix ALL locators listed above in a single pass.
+- Do NOT change any other fields, structure, or formatting.
+- Do NOT create new files.
+- Prefer #id selectors when an id attribute exists on the matching element.`;
 }
 
 /**
@@ -174,21 +189,53 @@ function invokeCursorAgent(prompt, contextName) {
   const promptFile = path.join(CONTEXT_DIR, `_prompt_${contextName}.txt`);
   fs.writeFileSync(promptFile, prompt, 'utf-8');
 
+  // Use forward slashes — both Windows and Unix accept them, avoids PS escape issues
+  const promptFileFwd = promptFile.replace(/\\/g, '/');
+  const workspaceFwd = WORKSPACE_DIR.replace(/\\/g, '/');
+  const agentBin = _agentCmd || 'agent'; // Clean path, no surrounding quotes
+
+  let runCmd;
+  let scriptFile;
+
+  if (process.platform === 'win32') {
+    // Prefer agent.ps1 over agent.cmd to avoid the cmd.exe -> PS chain.
+    // When agent.cmd is called, cmd.exe passes args via %* which corrupts multi-line strings.
+    // Calling agent.ps1 directly keeps everything inside PowerShell.
+    let agentRunner = agentBin;
+    if (/agent\.cmd$/i.test(agentBin)) {
+      const ps1Path = agentBin.replace(/agent\.cmd$/i, 'agent.ps1');
+      if (fs.existsSync(ps1Path)) agentRunner = ps1Path;
+    }
+    const agentRunnerFwd = agentRunner.replace(/\\/g, '/');
+
+    scriptFile = path.join(CONTEXT_DIR, `_run_${contextName}.ps1`);
+    // Use array splatting to pass $p as a single argument regardless of newlines.
+    // PS 5.1 can split unquoted multi-line variables when passed directly to &,
+    // but array-splatted elements are always treated as individual arguments.
+    const psScript = [
+      `$p = Get-Content -Raw "${promptFileFwd}"`,
+      `$agentArgs = @('-p', '--force', '--trust', '--workspace', "${workspaceFwd}", $p)`,
+      `& "${agentRunnerFwd}" @agentArgs`,
+    ].join('\n');
+    fs.writeFileSync(scriptFile, psScript, 'utf-8');
+    runCmd = `powershell -NoProfile -ExecutionPolicy Bypass -File "${scriptFile}"`;
+  } else {
+    scriptFile = path.join(CONTEXT_DIR, `_run_${contextName}.sh`);
+    const shScript = [
+      '#!/bin/bash',
+      `${agentBin.replace(/ /g, '\\ ')} -p --force --trust --workspace "${workspaceFwd}" "$(cat '${promptFileFwd}')"`,
+    ].join('\n');
+    fs.writeFileSync(scriptFile, shScript, 'utf-8');
+    fs.chmodSync(scriptFile, 0o755);
+    runCmd = `bash "${scriptFile}"`;
+  }
+
   try {
-    const escapedPromptFile = promptFile.replace(/\\/g, '/');
-    const escapedWorkspace = WORKSPACE_DIR.replace(/\\/g, '/');
-
-    const promptContent = fs.readFileSync(promptFile, 'utf-8');
-    const escapedPrompt = promptContent.replace(/"/g, '\\"').replace(/\n/g, ' ');
-    const agentBin = _agentCmd || 'agent';
-    const cmd = `${agentBin} -p --force --trust --workspace "${escapedWorkspace}" "${escapedPrompt}"`;
-
-    const output = execSync(cmd, {
+    const output = execSync(runCmd, {
       timeout: AGENT_TIMEOUT_MS,
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
       cwd: WORKSPACE_DIR,
-      shell: true,
     });
 
     const durationMs = Date.now() - startTime;
@@ -204,6 +251,7 @@ function invokeCursorAgent(prompt, contextName) {
     };
   } finally {
     try { fs.unlinkSync(promptFile); } catch { /* ignore */ }
+    try { if (scriptFile) fs.unlinkSync(scriptFile); } catch { /* ignore */ }
   }
 }
 
@@ -246,52 +294,61 @@ export async function cursorAgentHeal() {
     return { totalProcessed: 0, totalFixed: 0, totalFailed: 0, fixes: [], healingMethod: 'cursor-agent' };
   }
 
-  console.log(`\n  🤖 Cursor Agent healing ${contextFiles.length} broken locator(s)...\n`);
+  console.log(`\n  🤖 Cursor Agent healing ${contextFiles.length} broken locator(s) in a SINGLE request...\n`);
 
-  const fixes = [];
+  const contexts = contextFiles.map((file) => {
+    const contextPath = path.join(CONTEXT_DIR, file);
+    return JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
+  });
+
+  for (const ctx of contexts) {
+    const locatorKey = ctx.locatorSource
+      ? `${ctx.locatorSource.exportName}.${ctx.locatorSource.key}`
+      : 'unknown';
+    console.log(`  - ${locatorKey} (${ctx.failedLocator})`);
+  }
+
+  const prompt = buildBatchPrompt(contexts);
+  console.log(`\n  📤 Sending batch prompt to Cursor Agent (${contexts.length} locators)...`);
+
+  const result = invokeCursorAgent(prompt, 'batch-all');
+
   let totalFixed = 0;
   let totalFailed = 0;
+  const fixes = [];
 
-  for (const file of contextFiles) {
-    const contextPath = path.join(CONTEXT_DIR, file);
-    const context = JSON.parse(fs.readFileSync(contextPath, 'utf-8'));
-    const contextName = file.replace('.context.json', '');
-    const locatorKey = context.locatorSource
-      ? `${context.locatorSource.exportName}.${context.locatorSource.key}`
+  if (result.success) {
+    totalFixed = contexts.length;
+    console.log(`  ✅ Agent completed in ${(result.durationMs / 1000).toFixed(1)}s`);
+    console.log(`     All ${contexts.length} locators processed in one request.`);
+  } else {
+    totalFailed = contexts.length;
+    console.log(`  ❌ Agent failed after ${(result.durationMs / 1000).toFixed(1)}s`);
+  }
+
+  if (result.output?.trim()) {
+    const preview = result.output.trim().substring(0, 800);
+    console.log(`\n  📝 Agent output:\n${preview.split('\n').map((l) => `     ${l}`).join('\n')}`);
+  }
+
+  for (const ctx of contexts) {
+    const locatorKey = ctx.locatorSource
+      ? `${ctx.locatorSource.exportName}.${ctx.locatorSource.key}`
       : 'unknown';
-
-    console.log(`  ── Healing: ${locatorKey} (${context.failedLocator})`);
-
-    const prompt = buildPrompt(context);
-    const result = invokeCursorAgent(prompt, contextName);
-
-    if (result.success) {
-      totalFixed++;
-      console.log(`  ✅ Agent completed in ${(result.durationMs / 1000).toFixed(1)}s`);
-    } else {
-      totalFailed++;
-      console.log(`  ❌ Agent failed after ${(result.durationMs / 1000).toFixed(1)}s`);
-      if (result.output) {
-        const preview = result.output.substring(0, 200);
-        console.log(`     ${preview}`);
-      }
-    }
-
     fixes.push({
       locatorKey,
-      failedLocator: context.failedLocator,
-      prompt: prompt.substring(0, 500) + '...',
+      failedLocator: ctx.failedLocator,
       agentSuccess: result.success,
-      agentOutput: result.output.substring(0, 1000),
       durationMs: result.durationMs,
       status: result.success ? 'FIXED_BY_AGENT' : 'AGENT_FAILED',
     });
   }
 
   console.log(`\n  ── CURSOR AGENT SUMMARY ──────────────────────────`);
-  console.log(`  Total processed: ${contextFiles.length}`);
-  console.log(`  Fixed by Agent:  ${totalFixed}`);
-  console.log(`  Failed:          ${totalFailed}`);
+  console.log(`  Total locators:  ${contextFiles.length}`);
+  console.log(`  API requests:    1`);
+  console.log(`  Result:          ${result.success ? 'SUCCESS' : 'FAILED'}`);
+  console.log(`  Duration:        ${(result.durationMs / 1000).toFixed(1)}s`);
   console.log(`  ──────────────────────────────────────────────────\n`);
 
   return {

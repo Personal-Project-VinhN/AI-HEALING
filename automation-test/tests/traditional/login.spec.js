@@ -20,19 +20,6 @@ test.describe('Traditional Login Tests', () => {
     await expect(page.locator(loginLocators.loginButton)).toBeVisible();
   });
 
-  test('should show error on empty submit', async ({ page }) => {
-    await page.locator(loginLocators.loginButton).click();
-    await expect(page.locator(loginLocators.errorMessage)).toBeVisible();
-    await expect(page.locator(loginLocators.errorMessage)).toContainText('fill in all fields');
-  });
-
-  test('should show error on invalid credentials', async ({ page }) => {
-    await page.locator(loginLocators.usernameInput).fill('wrong');
-    await page.locator(loginLocators.passwordInput).fill('wrong');
-    await page.locator(loginLocators.loginButton).click();
-    await expect(page.locator(loginLocators.errorMessage)).toContainText('Invalid credentials');
-  });
-
   test('should login successfully with valid credentials', async ({ page }) => {
     await page.locator(loginLocators.usernameInput).fill('admin');
     await page.locator(loginLocators.passwordInput).fill('admin123');

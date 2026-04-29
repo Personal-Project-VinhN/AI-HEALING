@@ -12,18 +12,15 @@ import { dashboardLocators, profileLocators } from '../../locators/dashboard.loc
  */
 test.describe('Traditional Success Validation Tests', () => {
   test('full E2E flow: login -> dashboard -> create user -> success', async ({ page }) => {
-    // Step 1: Login
     await page.goto('/login');
     await page.locator(loginLocators.usernameInput).fill('admin');
     await page.locator(loginLocators.passwordInput).fill('admin123');
     await page.locator(loginLocators.loginButton).click();
     await expect(page).toHaveURL(/.*dashboard/);
 
-    // Step 2: Verify dashboard
     await expect(page.locator(dashboardLocators.pageTitle)).toBeVisible();
     await expect(page.locator(dashboardLocators.userTable)).toBeVisible();
 
-    // Step 3: Navigate to profile and submit form
     await page.locator(dashboardLocators.navProfile).click();
     await expect(page).toHaveURL(/.*profile/);
 
@@ -33,7 +30,6 @@ test.describe('Traditional Success Validation Tests', () => {
     await page.locator(profileLocators.userRole).selectOption('admin');
     await page.locator(profileLocators.saveButton).click();
 
-    // Step 4: Validate success
     await expect(page.locator(profileLocators.successMessage)).toBeVisible();
     await expect(page.locator(profileLocators.successMessage)).toContainText('successfully');
   });

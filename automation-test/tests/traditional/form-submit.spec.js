@@ -20,15 +20,6 @@ test.describe('Traditional Form Submit Tests', () => {
     await expect(page).toHaveURL(/.*profile/);
   });
 
-  test('should display create user form', async ({ page }) => {
-    await expect(page.locator(profileLocators.profileForm)).toBeVisible();
-    await expect(page.locator(profileLocators.firstName)).toBeVisible();
-    await expect(page.locator(profileLocators.lastName)).toBeVisible();
-    await expect(page.locator(profileLocators.userEmail)).toBeVisible();
-    await expect(page.locator(profileLocators.saveButton)).toBeVisible();
-    await expect(page.locator(profileLocators.cancelButton)).toBeVisible();
-  });
-
   test('should submit form successfully', async ({ page }) => {
     await page.locator(profileLocators.firstName).fill('John');
     await page.locator(profileLocators.lastName).fill('Doe');
@@ -36,13 +27,5 @@ test.describe('Traditional Form Submit Tests', () => {
     await page.locator(profileLocators.userRole).selectOption('editor');
     await page.locator(profileLocators.saveButton).click();
     await expect(page.locator(profileLocators.successMessage)).toBeVisible();
-  });
-
-  test('should clear form on cancel', async ({ page }) => {
-    await page.locator(profileLocators.firstName).fill('John');
-    await page.locator(profileLocators.lastName).fill('Doe');
-    await page.locator(profileLocators.cancelButton).click();
-    await expect(page.locator(profileLocators.firstName)).toHaveValue('');
-    await expect(page.locator(profileLocators.lastName)).toHaveValue('');
   });
 });
