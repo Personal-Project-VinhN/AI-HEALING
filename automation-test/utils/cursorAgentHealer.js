@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -8,6 +9,42 @@ const CONTEXT_DIR = path.join(__dirname, '..', 'healing-context');
 const WORKSPACE_DIR = path.resolve(__dirname, '..', '..');
 
 const AGENT_TIMEOUT_MS = 180_000;
+
+/**
+ * Resolve the full path to the Cursor Agent CLI binary.
+ * Checks PATH first, then known install locations per platform.
+ */
+function resolveAgentPath() {
+  const tryCmd = (cmd) => {
+    try {
+      execSync(`${cmd} --version`, { stdio: 'pipe', timeout: 10_000, shell: true });
+      return cmd;
+    } catch { return null; }
+  };
+
+  const fromPath = tryCmd('agent');
+  if (fromPath) return fromPath;
+
+  const homeDir = os.homedir();
+  const candidates = process.platform === 'win32'
+    ? [
+        path.join(homeDir, 'AppData', 'Local', 'cursor-agent', 'agent.cmd'),
+        path.join(homeDir, '.cursor', 'bin', 'agent.cmd'),
+      ]
+    : [
+        path.join(homeDir, '.cursor', 'bin', 'agent'),
+        '/usr/local/bin/agent',
+      ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      const resolved = tryCmd(`"${candidate}"`);
+      if (resolved) return resolved;
+    }
+  }
+
+  return null;
+}
 
 /**
  * Cursor Agent Healer.
@@ -30,13 +67,14 @@ const AGENT_TIMEOUT_MS = 180_000;
  * @author Gin<gin_vn@haldata.net>
  * @lastupdate Gin<gin_vn@haldata.net>
  */
+let _agentCmd = undefined;
+
 function isCursorAgentAvailable() {
-  try {
-    execSync('agent --version', { stdio: 'pipe', timeout: 10_000 });
-    return true;
-  } catch {
-    return false;
+  _agentCmd = resolveAgentPath();
+  if (_agentCmd) {
+    console.log(`  ✅ Found Cursor Agent CLI: ${_agentCmd}`);
   }
+  return !!_agentCmd;
 }
 
 /**
@@ -140,28 +178,18 @@ function invokeCursorAgent(prompt, contextName) {
     const escapedPromptFile = promptFile.replace(/\\/g, '/');
     const escapedWorkspace = WORKSPACE_DIR.replace(/\\/g, '/');
 
-    const cmd = `agent -p --force --trust --workspace "${escapedWorkspace}" "$(cat '${escapedPromptFile}')"`;
+    const promptContent = fs.readFileSync(promptFile, 'utf-8');
+    const escapedPrompt = promptContent.replace(/"/g, '\\"').replace(/\n/g, ' ');
+    const agentBin = _agentCmd || 'agent';
+    const cmd = `${agentBin} -p --force --trust --workspace "${escapedWorkspace}" "${escapedPrompt}"`;
 
-    let output;
-    try {
-      output = execSync(cmd, {
-        timeout: AGENT_TIMEOUT_MS,
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-        cwd: WORKSPACE_DIR,
-        shell: true,
-      });
-    } catch (shellErr) {
-      const promptContent = fs.readFileSync(promptFile, 'utf-8');
-      const cmdWin = `agent -p --force --trust --workspace "${escapedWorkspace}" "${promptContent.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`;
-
-      output = execSync(cmdWin, {
-        timeout: AGENT_TIMEOUT_MS,
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-        cwd: WORKSPACE_DIR,
-      });
-    }
+    const output = execSync(cmd, {
+      timeout: AGENT_TIMEOUT_MS,
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+      cwd: WORKSPACE_DIR,
+      shell: true,
+    });
 
     const durationMs = Date.now() - startTime;
     return { success: true, output: output || '', durationMs };
@@ -192,8 +220,8 @@ function invokeCursorAgent(prompt, contextName) {
 export async function cursorAgentHeal() {
   if (!isCursorAgentAvailable()) {
     console.log('  ❌ Cursor Agent CLI (`agent`) not found in PATH.');
-    console.log('     Make sure Cursor Desktop is installed and `agent` is accessible.');
-    console.log('     On Windows: check if Cursor added agent to PATH.');
+    console.log('     Install: irm "https://cursor.com/install?win32=true" | iex');
+    console.log('     Then run: agent login');
     console.log('     Alternatively, run `npm run heal:fix-rule` for rule-based fallback.\n');
     return {
       totalProcessed: 0,
