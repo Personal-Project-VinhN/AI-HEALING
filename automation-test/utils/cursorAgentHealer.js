@@ -12,24 +12,46 @@ const AGENT_TIMEOUT_MS = 180_000;
 
 /**
  * Resolve the full path to the Cursor Agent CLI binary.
- * Checks PATH first, then known install locations per platform.
+ *
+ * The Cursor CLI is distributed under two binary names depending on
+ * version/platform: legacy `agent` and current `cursor-agent`. We probe
+ * PATH first for both, then fall back to a list of well-known install
+ * locations (the docs install to `~/.local/bin` on macOS/Linux, but
+ * users often have it in `/opt/homebrew/bin`, `/usr/local/bin`, or the
+ * Cursor app data dir).
+ *
+ * @returns {string|null} Absolute path or bare name of the CLI, or null.
  */
 function resolveAgentPath() {
-  // Try plain 'agent' from PATH first
-  try {
-    execSync('agent --version', { stdio: 'pipe', timeout: 10_000, shell: true });
-    return 'agent';
-  } catch { /* not in PATH */ }
+  const binNames = process.platform === 'win32'
+    ? ['cursor-agent.cmd', 'agent.cmd', 'cursor-agent.exe', 'agent.exe']
+    : ['cursor-agent', 'agent'];
+
+  for (const name of binNames) {
+    try {
+      execSync(`${name} --version`, { stdio: 'pipe', timeout: 10_000, shell: true });
+      return name;
+    } catch { /* not in PATH, try next */ }
+  }
 
   const homeDir = os.homedir();
   const candidates = process.platform === 'win32'
     ? [
+        path.join(homeDir, 'AppData', 'Local', 'cursor-agent', 'cursor-agent.cmd'),
         path.join(homeDir, 'AppData', 'Local', 'cursor-agent', 'agent.cmd'),
+        path.join(homeDir, '.cursor', 'bin', 'cursor-agent.cmd'),
         path.join(homeDir, '.cursor', 'bin', 'agent.cmd'),
       ]
     : [
+        path.join(homeDir, '.local', 'bin', 'cursor-agent'),
+        path.join(homeDir, '.local', 'bin', 'agent'),
+        path.join(homeDir, '.local', 'share', 'cursor-agent', 'cursor-agent'),
         path.join(homeDir, '.local', 'share', 'cursor-agent', 'agent'),
+        path.join(homeDir, '.cursor', 'bin', 'cursor-agent'),
         path.join(homeDir, '.cursor', 'bin', 'agent'),
+        '/opt/homebrew/bin/cursor-agent',
+        '/opt/homebrew/bin/agent',
+        '/usr/local/bin/cursor-agent',
         '/usr/local/bin/agent',
       ];
 
@@ -37,7 +59,7 @@ function resolveAgentPath() {
     if (fs.existsSync(candidate)) {
       try {
         execSync(`"${candidate}" --version`, { stdio: 'pipe', timeout: 10_000, shell: true });
-        return candidate; // Return clean path — no surrounding quotes
+        return candidate;
       } catch { /* try next */ }
     }
   }
@@ -198,12 +220,13 @@ function invokeCursorAgent(prompt, contextName) {
   let scriptFile;
 
   if (process.platform === 'win32') {
-    // Prefer agent.ps1 over agent.cmd to avoid the cmd.exe -> PS chain.
-    // When agent.cmd is called, cmd.exe passes args via %* which corrupts multi-line strings.
-    // Calling agent.ps1 directly keeps everything inside PowerShell.
+    // Prefer the .ps1 wrapper over .cmd to avoid the cmd.exe -> PS chain.
+    // When *.cmd is called, cmd.exe passes args via %* which corrupts
+    // multi-line strings. Calling the .ps1 directly keeps everything in PS.
     let agentRunner = agentBin;
-    if (/agent\.cmd$/i.test(agentBin)) {
-      const ps1Path = agentBin.replace(/agent\.cmd$/i, 'agent.ps1');
+    const cmdMatch = agentBin.match(/^(.*)(agent|cursor-agent)\.cmd$/i);
+    if (cmdMatch) {
+      const ps1Path = `${cmdMatch[1]}${cmdMatch[2]}.ps1`;
       if (fs.existsSync(ps1Path)) agentRunner = ps1Path;
     }
     const agentRunnerFwd = agentRunner.replace(/\\/g, '/');
@@ -267,9 +290,19 @@ function invokeCursorAgent(prompt, contextName) {
  */
 export async function cursorAgentHeal() {
   if (!isCursorAgentAvailable()) {
-    console.log('  ❌ Cursor Agent CLI (`agent`) not found in PATH.');
-    console.log('     Install: irm "https://cursor.com/install?win32=true" | iex');
-    console.log('     Then run: agent login');
+    const isWindows = process.platform === 'win32';
+    console.log('  ❌ Cursor Agent CLI (`cursor-agent`/`agent`) not found.');
+    if (isWindows) {
+      console.log('     Install (Windows PowerShell):');
+      console.log('       irm "https://cursor.com/install?win32=true" | iex');
+    } else {
+      console.log('     Install (macOS / Linux / WSL):');
+      console.log('       curl https://cursor.com/install -fsS | bash');
+      console.log('     Then ensure ~/.local/bin is on your PATH, e.g.:');
+      console.log('       echo \'export PATH="$HOME/.local/bin:$PATH"\' >> ~/.zshrc && source ~/.zshrc');
+    }
+    console.log('     Verify with: cursor-agent --version');
+    console.log('     Then run:    cursor-agent login');
     console.log('     Alternatively, run `npm run heal:fix-rule` for rule-based fallback.\n');
     return {
       totalProcessed: 0,
